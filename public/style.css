@@ -1,0 +1,43 @@
+body {
+    font-family: sans-serif;
+    padding: 20px;
+}
+#game-area {
+    margin-bottom: 20px;
+}
+#get-item-button {
+    padding: 15px 30px;
+    font-size: 1.2em;
+    cursor: pointer;
+}
+#remaining-count {
+    font-size: 1.5em;
+    font-weight: bold;
+    margin: 20px 0;
+}
+#my-items {
+    border: 1px solid #28a745;
+    padding: 10px;
+    border-radius: 8px;
+}
+.items-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 15px;
+    margin-top: 10px;
+}
+.item-card {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+.item-card img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 4px;
+}
+.item-card p {
+    margin: 8px 0 0 0;
+    font-size: 0.9em;
+}
