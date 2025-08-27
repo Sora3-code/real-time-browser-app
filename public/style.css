@@ -2,6 +2,17 @@ body {
     font-family: sans-serif;
     padding: 20px;
 }
+.hidden {
+    display: none;
+}
+#start-button {
+    padding: 10px 15px;
+    cursor: pointer;
+    background-color: #95a5fc;
+}
+#start-button:hover {
+    background-color: #7589ff;
+}
 #game-area {
     margin-bottom: 20px;
 }
