@@ -4,12 +4,6 @@
 let socket = io('https://real-time-browser-app.onrender.com'); //render用
 //-----------------------------------------------------------------------
 
-let myId = '';
-//-----------------------------------------------------------------------
-
-let allModals = [];
-//-----------------------------------------------------------------------
-
 let startButton = document.getElementById('start-button');
 let loginForm = document.getElementById('login-form');
 let passwordInput = document.getElementById('password-input');
@@ -18,34 +12,13 @@ let gameArea = document.getElementById('game-area');
 let myItemsContainer = document.getElementById('my-items');
 //-----------------------------------------------------------------------
 
-startButton.addEventListener('click', () => {
-    startButton.classList.add('hidden');
-    loginForm.classList.remove('hidden');
-});
+let myId = '';
 //-----------------------------------------------------------------------
 
-loginButton.addEventListener('click', () => {
-    socket.emit('checkPassword', passwordInput.value);
-});
-//-----------------------------------------------------------------------
-
-socket.on('passwordResult', (result) => {
-    if(result.success) {
-        loginForm.classList.add('hidden');
-        gameArea.classList.remove('hidden');
-        myItemsContainer.classList.remove('hidden');
-        initializeGame();
-    } else {
-        alert('password is false.');
-        passwordInput.value = '';
-    }
-});
+let allModals = [];
 //-----------------------------------------------------------------------
 
 let myTakenModals = [];
-//-----------------------------------------------------------------------
-
-
 //-----------------------------------------------------------------------
 
 let updateRemainingCount = () => {
@@ -77,41 +50,57 @@ let updateMyItemsList = () => {
 };
 //-----------------------------------------------------------------------
 
-getItemButton.addEventListener('click', () => {
-    let nextModal = allModals.find(modal => modal.takenBy === null);
-    if(nextModal) {
-        socket.emit('takeModal', nextModal.id);
-    }
-});
-//-----------------------------------------------------------------------
-
-socket.on('connect', () => {
-    myId = socket.id;
-    console.log(`server connected. Your ID: ${myId}.`);
-});
-//-----------------------------------------------------------------------
-
-socket.on('initialModals', (initialModals) => {
-    allModals = initialModals;
-    myTakenModals = allModals.filter(m => m.takenBy === myId);
-    updateRemainingCount();
-    updateMyItemsList();
-});
-//-----------------------------------------------------------------------
-
-socket.on('modalTaken', ({modalId, userId}) => {
-    console.log(`user ${userId} is taked modal ${modalId}.`);
-    let takenModal = allModals.find(m => m.id === modalId);
-    if(takenModal) {
-        takenModal.takenBy = userId;
-        if(userId === myId) {
-            myTakenModals.push(takenModal);
-            updateMyItemsList();
-        }
+function initializeGame() {
+    socket.on('connect', () => {
+        myId = socket.id;
+        console.log(`server connected. Your ID: ${myId}.`);
+    });
+    socket.on('initialModals', (initialModals) => {
+        allModals = initialModals;
+        myTakenModals = allModals.filter(m => m.takenBy === myId);
         updateRemainingCount();
-    }
-});
+        updateMyItemsList();
+    });
+    socket.on('modalTaken', ({modalId, userId}) => {
+        console.log(`user ${userId} is taked modal ${modalId}.`);
+        let takenModal = allModals.find(m => m.id === modalId);
+        if(takenModal) {
+            takenModal.takenBy = userId;
+            if(userId === myId) {
+                myTakenModals.push(takenModal);
+                updateMyItemsList();
+            }
+            updateRemainingCount();
+        }
+    });
+    getItemButton.addEventListener('click', () => {
+        let nextModal = allModals.find(modal => modal.takenBy === null);
+        if(nextModal) {
+            socket.emit('takeModal', nextModal.id);
+        }
+    });
+    updateMyItemsList();
+}
+//-----------------------------------------------------------------------
+//Game start.
 //-----------------------------------------------------------------------
 
-updateMyItemsList();
+startButton.addEventListener('click', () => {
+    startButton.classList.add('hidden');
+    loginForm.classList.remove('hidden');
+});
+loginButton.addEventListener('click', () => {
+    socket.emit('checkPassword', passwordInput.value);
+});
+socket.on('passwordResult', (result) => {
+    if(result.success) {
+        loginForm.classList.add('hidden');
+        gameArea.classList.remove('hidden');
+        myItemsContainer.classList.remove('hidden');
+        initializeGame();
+    } else {
+        alert('password is false.');
+        passwordInput.value = '';
+    }
+});
 //-----------------------------------------------------------------------
