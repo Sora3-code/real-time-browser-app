@@ -9,6 +9,8 @@ let loginForm = document.getElementById('login-form');
 let passwordInput = document.getElementById('password-input');
 let loginButton = document.getElementById('login-button');
 let gameArea = document.getElementById('game-area');
+let remainingCount =document.getElementById('remaining-count');
+let getItemButton = document.getElementById('get-item-button');
 let myItemsContainer = document.getElementById('my-items');
 //-----------------------------------------------------------------------
 
