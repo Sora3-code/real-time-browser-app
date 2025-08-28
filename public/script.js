@@ -24,7 +24,28 @@ startButton.addEventListener('click', () => {
 });
 //-----------------------------------------------------------------------
 
+loginButton.addEventListener('click', () => {
+    socket.emit('checkPassword', passwordInput.value);
+});
+//-----------------------------------------------------------------------
+
+socket.on('passwordResult', (result) => {
+    if(result.success) {
+        loginForm.classList.add('hidden');
+        gameArea.classList.remove('hidden');
+        myItemsContainer.classList.remove('hidden');
+        initializeGame();
+    } else {
+        alert('password is false.');
+        passwordInput.value = '';
+    }
+});
+//-----------------------------------------------------------------------
+
 let myTakenModals = [];
+//-----------------------------------------------------------------------
+
+
 //-----------------------------------------------------------------------
 
 let updateRemainingCount = () => {
