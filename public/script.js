@@ -10,9 +10,18 @@ let myId = '';
 let allModals = [];
 //-----------------------------------------------------------------------
 
-let getItemButton = document.getElementById('get-item-button');
-let remainingCountElement = document.getElementById('remaining-count');
+let startButton = document.getElementById('start-button');
+let loginForm = document.getElementById('login-form');
+let passwordInput = document.getElementById('password-input');
+let loginButton = document.getElementById('login-button');
+let gameArea = document.getElementById('game-area');
 let myItemsContainer = document.getElementById('my-items');
+//-----------------------------------------------------------------------
+
+startButton.addEventListener('click', () => {
+    startButton.classList.add('hidden');
+    loginForm.classList.remove('hidden');
+});
 //-----------------------------------------------------------------------
 
 let myTakenModals = [];

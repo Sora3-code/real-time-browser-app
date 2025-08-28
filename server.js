@@ -13,6 +13,9 @@ let io = new Server(server);
 let TOTAL_MODALS = 10;
 //-----------------------------------------------------------------------
 
+let CORRECT_PASSWORD = 'hope';
+//-----------------------------------------------------------------------
+
 let modals = [
     { id: 0, image: 'images/1.jpg', text: '------- Ishiba Shigeru -------\n---------- 自然との共生を大事にする事 ----------', takenBy: null, password:'a',isImportant:false},
     { id: 1, image: 'images/2.jpg', text: '------- Donald Trump -------\n---------- the Earth is mankind`s oldest best friend ----------', takenBy: null, password:'a',isImportant:true},
@@ -32,6 +35,13 @@ app.use(express.static('public'));
 
 io.on('connection', (socket) => {
     console.log(`user is connected: ${socket.id}` );
+    socket.on('checkPassword', (submittedPassword) => {
+        if(submittedPassword === CORRECT_PASSWORD) {
+            socket.emit('passwordResult', {success: true});
+        } else {
+            socket.emit('passwordResult', {success: false});
+        }
+    });
     socket.emit('initialModals', modals);
     socket.on('takeModal', (modalId) => {
         let modal = modals.find(m => m.id === modalId);
