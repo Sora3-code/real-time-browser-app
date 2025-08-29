@@ -1,7 +1,7 @@
 //-----------------------------------------------------------------------
 
-let socket = io();  //localhost用
-//let socket = io('https://real-time-browser-app.onrender.com'); //render用
+//let socket = io();  //localhost用
+let socket = io('https://real-time-browser-app.onrender.com'); //render用
 //-----------------------------------------------------------------------
 
 let startButton = document.getElementById('start-button');
