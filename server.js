@@ -38,11 +38,11 @@ io.on('connection', (socket) => {
     socket.on('checkPassword', (submittedPassword) => {
         if(submittedPassword === CORRECT_PASSWORD) {
             socket.emit('passwordResult', {success: true});
+            socket.emit('initialModals', modals);
         } else {
             socket.emit('passwordResult', {success: false});
         }
     });
-    socket.emit('initialModals', modals);
     socket.on('takeModal', (modalId) => {
         let modal = modals.find(m => m.id === modalId);
         if (modal && modal.takenBy === null) {

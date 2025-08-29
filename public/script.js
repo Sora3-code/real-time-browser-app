@@ -1,7 +1,7 @@
 //-----------------------------------------------------------------------
 
-//let socket = io();  //localhost用
-let socket = io('https://real-time-browser-app.onrender.com'); //render用
+let socket = io();  //localhost用
+//let socket = io('https://real-time-browser-app.onrender.com'); //render用
 //-----------------------------------------------------------------------
 
 let startButton = document.getElementById('start-button');
@@ -9,6 +9,8 @@ let loginForm = document.getElementById('login-form');
 let passwordInput = document.getElementById('password-input');
 let loginButton = document.getElementById('login-button');
 let gameArea = document.getElementById('game-area');
+let remainingCountElement = document.getElementById('remaining-count');
+let getItemButton = document.getElementById('get-item-button');
 let myItemsContainer = document.getElementById('my-items');
 //-----------------------------------------------------------------------
 
@@ -21,7 +23,63 @@ let allModals = [];
 let myTakenModals = [];
 //-----------------------------------------------------------------------
 
-let updateRemainingCount = () => {
+socket.on('connect', () => {
+    myId = socket.id;
+    console.log(`server connected. Your ID: ${myId}.`);
+});
+//-----------------------------------------------------------------------
+//Game start.
+//-----------------------------------------------------------------------
+
+startButton.addEventListener('click', () => {
+    startButton.classList.add('hidden');
+    loginForm.classList.remove('hidden');
+});
+loginButton.addEventListener('click', () => {
+    socket.emit('checkPassword', passwordInput.value);
+});
+getItemButton.addEventListener('click', () => {
+    let nextModal = allModals.find(modal => modal.takenBy === null);
+    if(nextModal) {
+        socket.emit('takeModal', nextModal.id);
+    }
+});
+socket.on('passwordResult', (result) => {
+    if(result.success) {
+        loginForm.classList.add('hidden');
+        gameArea.classList.remove('hidden');
+        myItemsContainer.classList.remove('hidden');
+        initializeGame();
+    } else {
+        alert('password is false.');
+        passwordInput.value = '';
+    }
+});
+//-----------------------------------------------------------------------
+
+function initializeGame() {
+    socket.on('initialModals', (initialModals) => {
+        allModals = initialModals;
+        myTakenModals = allModals.filter(m => m.takenBy === myId);
+        updateRemainingCount();
+        updateMyItemsList();
+    });
+    socket.on('modalTaken', ({modalId, userId}) => {
+        console.log(`user ${userId} is taked modal ${modalId}.`);
+        let takenModal = allModals.find(m => m.id === modalId);
+        if(takenModal) {
+            takenModal.takenBy = userId;
+            if(userId === myId) {
+                myTakenModals.push(takenModal);
+                updateMyItemsList();
+            }
+            updateRemainingCount();
+        }
+    });  
+}
+//-----------------------------------------------------------------------
+
+function updateRemainingCount() {
     let remaining = allModals.filter(modal => modal.takenBy === null).length;
     remainingCountElement.textContent = `残り: ${remaining}個.`;
     if(remaining === 0) {
@@ -31,7 +89,7 @@ let updateRemainingCount = () => {
 };
 //-----------------------------------------------------------------------
 
-let updateMyItemsList = () => {
+function updateMyItemsList() {
     myItemsContainer.innerHTML = '<h2>あなたが取得したアイテム.</h2>';
     if(myTakenModals.length === 0) {
         myItemsContainer.innerHTML += '<p>まだありません.</p>';
@@ -50,57 +108,6 @@ let updateMyItemsList = () => {
 };
 //-----------------------------------------------------------------------
 
-function initializeGame() {
-    socket.on('connect', () => {
-        myId = socket.id;
-        console.log(`server connected. Your ID: ${myId}.`);
-    });
-    socket.on('initialModals', (initialModals) => {
-        allModals = initialModals;
-        myTakenModals = allModals.filter(m => m.takenBy === myId);
-        updateRemainingCount();
-        updateMyItemsList();
-    });
-    socket.on('modalTaken', ({modalId, userId}) => {
-        console.log(`user ${userId} is taked modal ${modalId}.`);
-        let takenModal = allModals.find(m => m.id === modalId);
-        if(takenModal) {
-            takenModal.takenBy = userId;
-            if(userId === myId) {
-                myTakenModals.push(takenModal);
-                updateMyItemsList();
-            }
-            updateRemainingCount();
-        }
-    });
-    getItemButton.addEventListener('click', () => {
-        let nextModal = allModals.find(modal => modal.takenBy === null);
-        if(nextModal) {
-            socket.emit('takeModal', nextModal.id);
-        }
-    });
-    updateMyItemsList();
-}
-//-----------------------------------------------------------------------
-//Game start.
-//-----------------------------------------------------------------------
 
-startButton.addEventListener('click', () => {
-    startButton.classList.add('hidden');
-    loginForm.classList.remove('hidden');
-});
-loginButton.addEventListener('click', () => {
-    socket.emit('checkPassword', passwordInput.value);
-});
-socket.on('passwordResult', (result) => {
-    if(result.success) {
-        loginForm.classList.add('hidden');
-        gameArea.classList.remove('hidden');
-        myItemsContainer.classList.remove('hidden');
-        initializeGame();
-    } else {
-        alert('password is false.');
-        passwordInput.value = '';
-    }
-});
-//-----------------------------------------------------------------------
+
+
