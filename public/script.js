@@ -29,16 +29,15 @@ let isInitialLogin = true;
 //-----------------------------------------------------------------------
 //Game start.
 //-----------------------------------------------------------------------
-socket.on('connect', () => {
-    myId = socket.id;
-    console.log(`server connected. Your ID: ${myId}.`);
-});
+
 startButton.addEventListener('click', () => {
     startButton.classList.add('hidden');
     loginForm.classList.remove('hidden');
 });
 loginButton.addEventListener('click', () => {
-    socket.emit('checkPassword', passwordInput.value);
+    let password = passwordInput.value;
+    let type = isInitialLogin ? 'initial' : 'intermission';
+    socket.emit('checkPassword', { password: password, type: type });
 });
 getItemButton.addEventListener('click', () => {
     let nextModal = allModals.find(modal => modal.takenBy === null);
@@ -46,6 +45,10 @@ getItemButton.addEventListener('click', () => {
         getItemButton.disabled = true;
         socket.emit('takeModal', nextModal.id);
     }
+});
+socket.on('connect', () => {
+    myId = socket.id;
+    console.log(`server connected. Your ID: ${myId}.`);
 });
 socket.on('passwordResult', (result) => {
     if(result.success) {
@@ -96,7 +99,7 @@ function initializeGame() {
 function showIntermissionPasswordForm() {
     initialLoginTitle.classList.add('hidden');
     intermissionTitle.classList.remove('hidden');
-    loginForm.classList.add('hidden');
+    loginForm.classList.remove('hidden');
 }
 //-----------------------------------------------------------------------
 
@@ -111,9 +114,9 @@ function updateRemainingCount() {
 //-----------------------------------------------------------------------
 
 function updateMyItemsList() {
-    myItemsContainer.innerHTML = '<h2>あなたが取得したアイテム.</h2>';
+    myItemsContainer.innerHTML = '<h2>Your Get Items.</h2>';
     if(myTakenModals.length === 0) {
-        myItemsContainer.innerHTML += '<p>まだありません.</p>';
+        myItemsContainer.innerHTML += '<p>not Items.</p>';
         return;
     }
     let itemsGrid = document.createElement('div');

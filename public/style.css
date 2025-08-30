@@ -32,8 +32,9 @@ body {
     border-radius: 8px;
 }
 .items-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     gap: 15px;
     margin-top: 10px;
 }
@@ -42,13 +43,20 @@ body {
     border-radius: 8px;
     padding: 8px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 .item-card img {
-    max-width: 100%;
-    height: auto;
+    max-width: 150px;
+    height: 150px;
+    object-fit: cover;
     border-radius: 4px;
+    flex-shrink: 0;
 }
 .item-card p {
-    margin: 8px 0 0 0;
+    margin: 0;
     font-size: 0.9em;
+    flex-grow: 1;
+    text-align: center;
 }
