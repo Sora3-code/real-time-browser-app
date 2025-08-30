@@ -1,11 +1,13 @@
 //-----------------------------------------------------------------------
 
-//let socket = io();  //localhost用
-let socket = io('https://real-time-browser-app.onrender.com'); //render用
+let socket = io();  //localhost用
+//let socket = io('https://real-time-browser-app.onrender.com'); //render用
 //-----------------------------------------------------------------------
 
 let startButton = document.getElementById('start-button');
 let loginForm = document.getElementById('login-form');
+let initialLoginTitle = document.getElementById('initial-login-title');
+let intermissionTitle = document.getElementById('intermission-title');
 let passwordInput = document.getElementById('password-input');
 let loginButton = document.getElementById('login-button');
 let gameArea = document.getElementById('game-area');
@@ -23,14 +25,14 @@ let allModals = [];
 let myTakenModals = [];
 //-----------------------------------------------------------------------
 
+let isInitialLogin = true;
+//-----------------------------------------------------------------------
+//Game start.
+//-----------------------------------------------------------------------
 socket.on('connect', () => {
     myId = socket.id;
     console.log(`server connected. Your ID: ${myId}.`);
 });
-//-----------------------------------------------------------------------
-//Game start.
-//-----------------------------------------------------------------------
-
 startButton.addEventListener('click', () => {
     startButton.classList.add('hidden');
     loginForm.classList.remove('hidden');
@@ -41,15 +43,23 @@ loginButton.addEventListener('click', () => {
 getItemButton.addEventListener('click', () => {
     let nextModal = allModals.find(modal => modal.takenBy === null);
     if(nextModal) {
+        getItemButton.disabled = true;
         socket.emit('takeModal', nextModal.id);
     }
 });
 socket.on('passwordResult', (result) => {
     if(result.success) {
-        loginForm.classList.add('hidden');
-        gameArea.classList.remove('hidden');
-        myItemsContainer.classList.remove('hidden');
-        initializeGame();
+        if(isInitialLogin) {
+            loginForm.classList.add('hidden');
+            gameArea.classList.remove('hidden');
+            myItemsContainer.classList.remove('hidden');
+            initializeGame();
+            isInitialLogin = false;
+        } else {
+            loginForm.classList.add = 'hidden';
+            getItemButton.disabled = false;
+        }
+        passwordInput.value = '';
     } else {
         alert('password is false.');
         passwordInput.value = '';
@@ -74,8 +84,19 @@ function initializeGame() {
                 updateMyItemsList();
             }
             updateRemainingCount();
+            let remaining = allModals.filter(modal => modal.takenBy === null).length;
+            if(remaining > 0) {
+                showIntermissionPasswordForm();
+            }
         }
     });  
+}
+//-----------------------------------------------------------------------
+
+function showIntermissionPasswordForm() {
+    initialLoginTitle.classList.add('hidden');
+    intermissionTitle.classList.remove('hidden');
+    loginForm.classList.add('hidden');
 }
 //-----------------------------------------------------------------------
 
