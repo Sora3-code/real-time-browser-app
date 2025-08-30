@@ -85,6 +85,9 @@ function initializeGame() {
             if(userId === myId) {
                 myTakenModals.push(takenModal);
                 updateMyItemsList();
+                if(takenModal.isImportant) {
+                    alert('Your lucky. Your matching.')
+                }
             }
             updateRemainingCount();
             let remaining = allModals.filter(modal => modal.takenBy === null).length;

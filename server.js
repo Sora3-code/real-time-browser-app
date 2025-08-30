@@ -17,16 +17,16 @@ let INTERMISSION_PASSWORD = 'pleasure';
 //-----------------------------------------------------------------------
 
 let modals = [
-    { id: 0, image: 'images/1.jpg', text: '------- Ishiba Shigeru -------<br>---------- 自然との共生を大事にする事 ----------', takenBy: null},
-    { id: 1, image: 'images/2.jpg', text: '------- Donald Trump -------<br>---------- the Earth is mankind\'s oldest best friend ----------', takenBy: null},
-    { id: 2, image: 'images/3.jpg', text: '------- Suzuki Kenta -------<br>---------- 未来の地球を支えるもの ----------', takenBy: null},
-    { id: 3, image: 'images/4.jpg', text: '------- Ado -------<br>---------- 歌い手にとっても、かけがえのない、すべて ----------', takenBy: null},
-    { id: 4, image: 'images/5.jpg', text: '-------  -------<br>----------  ----------', takenBy: null},
-    { id: 5, image: 'images/6.jpg', text: '-------  -------<br>----------  ----------', takenBy: null},
-    { id: 6, image: 'images/7.JPG', text: '-------  -------<br>----------  ----------', takenBy: null},
-    { id: 7, image: 'images/', text: '', takenBy: null},
-    { id: 8, image: 'images/', text: '', takenBy: null},
-    { id: 9, image: 'images/', text: '', takenBy: null}, //10
+    { id: 0, image: 'images/1.jpg', text: '------- Ishiba Shigeru -------<br>---------- 自然との共生を大事にする事 ----------', takenBy: null, isImportant: false},
+    { id: 1, image: 'images/2.jpg', text: '------- Donald Trump -------<br>---------- the Earth is mankind\'s oldest best friend ----------', takenBy: null, isImportant: true},
+    { id: 2, image: 'images/3.jpg', text: '------- Suzuki Kenta -------<br>---------- 未来の地球を支えるもの ----------', takenBy: null, isImportant: false},
+    { id: 3, image: 'images/4.jpg', text: '------- Ado -------<br>---------- 歌い手にとっても、かけがえのない、すべて ----------', takenBy: null, isImportant: true},
+    { id: 4, image: 'images/5.jpg', text: '-------  -------<br>----------  ----------', takenBy: null, isImportant: false},
+    { id: 5, image: 'images/6.jpg', text: '-------  -------<br>----------  ----------', takenBy: null, isImportant: false},
+    { id: 6, image: 'images/7.JPG', text: '-------  -------<br>----------  ----------', takenBy: null, isImportant: false},
+    { id: 7, image: 'images/', text: '', takenBy: null, isImportant: false},
+    { id: 8, image: 'images/', text: '', takenBy: null, isImportant: false},
+    { id: 9, image: 'images/', text: '', takenBy: null, isImportant: false}, //10
 ];
 //-----------------------------------------------------------------------
 
