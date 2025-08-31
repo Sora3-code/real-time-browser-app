@@ -2,9 +2,6 @@ body {
     font-family: sans-serif;
     padding: 20px;
 }
-.hidden {
-    display: none;
-}
 #start-button {
     padding: 10px 15px;
     cursor: pointer;
@@ -48,8 +45,8 @@ body {
     gap: 8px;
 }
 .item-card img {
-    max-width: 150px;
-    height: 150px;
+    max-width: 200px;
+    height: 200px;
     object-fit: cover;
     border-radius: 4px;
     flex-shrink: 0;
@@ -59,4 +56,33 @@ body {
     font-size: 0.9em;
     flex-grow: 1;
     text-align: center;
+}
+.custom-alert-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+.custom-alert-box {
+    background-color: white;
+    padding: 40px;
+    border-radius: 15px;
+    text-align: center;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    font-size: 1.5em;
+}
+.custom-alert-box button {
+    margin-top: 20px;
+    padding: 10px 20px;
+    font-size: 1em;
+    cursor: pointer;
+}
+.hidden {
+    display: none;
 }

@@ -1,7 +1,7 @@
 //-----------------------------------------------------------------------
 
-//let socket = io();  //localhost用
-let socket = io('https://real-time-browser-app.onrender.com'); //render用
+let socket = io();  //localhost用
+//let socket = io('https://real-time-browser-app.onrender.com'); //render用
 //-----------------------------------------------------------------------
 
 let startButton = document.getElementById('start-button');
@@ -14,6 +14,8 @@ let gameArea = document.getElementById('game-area');
 let remainingCountElement = document.getElementById('remaining-count');
 let getItemButton = document.getElementById('get-item-button');
 let myItemsContainer = document.getElementById('my-items');
+let customAlert = document.getElementById('custom-alert');
+let closeAlertButton = document.getElementById('close-alert-button');
 //-----------------------------------------------------------------------
 
 let myId = '';
@@ -38,6 +40,9 @@ loginButton.addEventListener('click', () => {
     let password = passwordInput.value;
     let type = isInitialLogin ? 'initial' : 'intermission';
     socket.emit('checkPassword', { password: password, type: type });
+});
+closeAlertButton.addEventListener('click', () => {
+    customAlert.classList.add('hidden');
 });
 getItemButton.addEventListener('click', () => {
     let nextModal = allModals.find(modal => modal.takenBy === null);
@@ -86,7 +91,9 @@ function initializeGame() {
                 myTakenModals.push(takenModal);
                 updateMyItemsList();
                 if(takenModal.isImportant) {
-                    alert('Your lucky. Your matching.')
+                    setTimeout(() => {
+                        customAlert.classList.remove('hidden');
+                    }, 3000);
                 }
             }
             updateRemainingCount();
