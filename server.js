@@ -1,5 +1,6 @@
 //-----------------------------------------------------------------------
 
+let fs = require('fs');
 let express = require('express');
 let http = require('http');
 let { Server } = require("socket.io");
@@ -57,6 +58,18 @@ io.on('connection', (socket) => {
             modal.takenBy = socket.id;
             console.log(`user ${socket.id} is modal ${modalId} Get.`);
             io.emit('modalTaken', { modalId: modalId, userId: socket.id });
+            if(modal.isImportant) {
+                let now = new Date();
+                let timestamp = now.toLocaleString('ja-JP');
+                let logMessage = `${timestamp} - ${modal.text.replace(/<[^>]*>/g, ' ')}\n`;
+                fs.appendFile('important_items.log', logMessage, (err) => {
+                    if(err) {
+                        console.error('writing Error.', err);
+                    } else {
+                        console.log('Important modal log is success.');
+                    }
+                });
+            }
         }
     });
     socket.on('disconnect', () => {
