@@ -15,7 +15,8 @@ let remainingCountElement = document.getElementById('remaining-count');
 let getItemButton = document.getElementById('get-item-button');
 let myItemsContainer = document.getElementById('my-items');
 let customAlert = document.getElementById('custom-alert');
-let closeAlertButton = document.getElementById('close-alert-button');
+let alertPasswordInput = document.getElementById('alert-password-input');
+let alertLoginButton = document.getElementById('alert-login-button');
 //-----------------------------------------------------------------------
 
 let myId = '';
@@ -41,8 +42,9 @@ loginButton.addEventListener('click', () => {
     let type = isInitialLogin ? 'initial' : 'intermission';
     socket.emit('checkPassword', { password: password, type: type });
 });
-closeAlertButton.addEventListener('click', () => {
-    customAlert.classList.add('hidden');
+alertLoginButton.addEventListener('click', () => {
+    let password = alertPasswordInput.value;
+    socket.emit('checkPassword', { password: password, type: 'intermission' });
 });
 getItemButton.addEventListener('click', () => {
     let nextModal = allModals.find(modal => modal.takenBy === null);
@@ -65,12 +67,15 @@ socket.on('passwordResult', (result) => {
             isInitialLogin = false;
         } else {
             loginForm.classList.add = 'hidden';
+            customAlert.classList.add = 'hidden';
+            alertPasswordInput.value = '';
             getItemButton.disabled = false;
         }
         passwordInput.value = '';
     } else {
         alert('password is false.');
         passwordInput.value = '';
+        alertPasswordInput.value = '';
     }
 });
 //-----------------------------------------------------------------------
