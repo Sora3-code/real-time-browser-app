@@ -39,12 +39,12 @@ startButton.addEventListener('click', () => {
 });
 loginButton.addEventListener('click', () => {
     let password = passwordInput.value;
-    let type = isInitialLogin ? 'initial' : 'intermission';
+    let type = isInitialLogin ? 'initial' : 'main_intermission';
     socket.emit('checkPassword', { password: password, type: type });
 });
 alertLoginButton.addEventListener('click', () => {
     let password = alertPasswordInput.value;
-    socket.emit('checkPassword', { password: password, type: 'intermission' });
+    socket.emit('checkPassword', { password: password, type: 'alert' });
 });
 getItemButton.addEventListener('click', () => {
     let nextModal = allModals.find(modal => modal.takenBy === null);
@@ -68,10 +68,10 @@ socket.on('passwordResult', (result) => {
         } else {
             loginForm.classList.add = 'hidden';
             customAlert.classList.add = 'hidden';
-            alertPasswordInput.value = '';
             getItemButton.disabled = false;
         }
         passwordInput.value = '';
+        alertPasswordInput.value = '';
     } else {
         alert('password is false.');
         passwordInput.value = '';
@@ -100,12 +100,12 @@ function initializeGame() {
                         customAlert.classList.remove('hidden');
                     }, 3000);
                 }
+                let remaining = allModals.filter(modal => modal.takenBy === null).length;
+                    if(remaining > 0 && !takenModal.isImportant) {
+                        showIntermissionPasswordForm();
+                    }
             }
-            updateRemainingCount();
-            let remaining = allModals.filter(modal => modal.takenBy === null).length;
-            if(remaining > 0) {
-                showIntermissionPasswordForm();
-            }
+            updateRemainingCount();   
         }
     });  
 }

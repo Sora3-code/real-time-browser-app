@@ -14,7 +14,10 @@ let io = new Server(server);
 let INITIAL_PASSWORD = 'hope';
 //-----------------------------------------------------------------------
 
-let INTERMISSION_PASSWORD = 'pleasure';
+let MAIN_INTERMISSION_PASSWORD = 'pleasure';
+//-----------------------------------------------------------------------
+
+let ALERT_PASSWORD = 'happiness';
 //-----------------------------------------------------------------------
 
 let modals = [
@@ -40,7 +43,9 @@ io.on('connection', (socket) => {
         let isCorrect = false;
         if(type === 'initial' && password === INITIAL_PASSWORD) {
             isCorrect = true;
-        } else if (type === 'intermission' && password === INTERMISSION_PASSWORD) {
+        } else if (type === 'main_intermission' && password === MAIN_INTERMISSION_PASSWORD) {
+            isCorrect = true;
+        } else if (type === 'alert' && password === ALERT_PASSWORD) {
             isCorrect = true;
         }
         if(isCorrect) {
