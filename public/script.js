@@ -88,6 +88,7 @@ socket.on('passwordResult', (result) => {
             gameArea.classList.remove('hidden');
             myItemsContainer.classList.remove('hidden');
             initializeGame();
+            isInitialLogin = false;
         } else if (result.type === 'main_intermission') {
             loginForm.classList.add('hidden');
             getItemButton.disabled = false;
@@ -124,11 +125,9 @@ function initializeGame() {
                     setTimeout(() => {
                         customAlert.classList.remove('hidden');
                     }, 3000);
+                } else if (allModals.filter(modal => modal.takenBy === null).length > 0) {
+                    showIntermissionPasswordForm();
                 }
-                let remaining = allModals.filter(modal => modal.takenBy === null).length;
-                    if(remaining > 0 && !takenModal.isImportant) {
-                        showIntermissionPasswordForm();
-                    }
             }
             updateRemainingCount();   
         }
