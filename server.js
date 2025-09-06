@@ -49,7 +49,7 @@ io.on('connection', (socket) => {
             isCorrect = true;
         }
         if(isCorrect) {
-            socket.emit('passwordResult', { success: true });
+            socket.emit('passwordResult', { success: true, type: type });
             if(type === 'initial') {
                 socket.emit('initialModals', modals);
             }
@@ -76,6 +76,30 @@ io.on('connection', (socket) => {
                 });
             }
         }
+    });
+    socket.on('submitUserInfo', (userInfo) => {
+        console.log('Recieved user info', userInfo);
+        let now = new Date();
+        let timestamp = now.toLocaleString('ja-JP');
+        let logMessage = 
+        `--- User Info Recieved: ${timestamp} ---
+        Treasure Name: ${userInfo.treasureName}
+        Name: ${userInfo.name}
+        Address: ${userInfo.address}
+        Age: ${userInfo.age}
+        School Name: ${userInfo.schoolName}
+        School TEL: ${userInfo.schoolTEL}
+        Dreame: ${userInfo.dream}
+        Socket ID: ${socket.id}
+        -----------------------------------------
+        `;
+        fs.appendFile('user-info-log', logMessage, (err) => {
+            if(err) {
+                console.error('Error writing user-info-log.:', err);
+            } else {
+                console.log('successfully wrote user-info-log.');
+            }
+        });
     });
     socket.on('disconnect', () => {
         console.log(`user is disconnected: ${socket.id}`);

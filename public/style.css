@@ -2,6 +2,9 @@ body {
     font-family: sans-serif;
     padding: 20px;
 }
+.hidden {
+    display: none;
+}
 #start-button {
     padding: 10px 15px;
     cursor: pointer;
@@ -83,6 +86,52 @@ body {
     font-size: 1em;
     cursor: pointer;
 }
-.hidden {
-    display: none;
+#user-info-form {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1001;
+}
+.user-info-box {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 15px;
+    text-align: center;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 90%;
+    max-width: 500px;
+}
+.user-info-box h2 {
+    color: #ff6347;
+    margin-top: 0;
+}
+.user-info-box input, .user-info-box textarea {
+    padding: 10px;
+    font-size: 1em;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 100%;
+    box-sizing: border-box;
+}
+.user-info-box button {
+    margin-top: 10px;
+    padding: 12px 20px;
+    font-size: 1.1em;
+    cursor: pointer;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 5px;
+}
+.user-info-box button:hover {
+    background-color: #218838;
 }

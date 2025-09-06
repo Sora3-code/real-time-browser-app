@@ -17,6 +17,15 @@ let myItemsContainer = document.getElementById('my-items');
 let customAlert = document.getElementById('custom-alert');
 let alertPasswordInput = document.getElementById('alert-password-input');
 let alertLoginButton = document.getElementById('alert-login-button');
+let userInfoForm = document.getElementById('user-info-form');
+let treasureName = document.getElementById('treasure-name');
+let userName = document.getElementById('user-name');
+let userAddress = document.getElementById('user-address');
+let userAge = document.getElementById('user-age');
+let schoolName = document.getElementById('school-name');
+let schoolTEL = document.getElementById('school-tel');
+let userDream = document.getElementById('user-dream');
+let submitUserInfoButton = document.getElementById('submit-user-info');
 //-----------------------------------------------------------------------
 
 let myId = '';
@@ -46,6 +55,21 @@ alertLoginButton.addEventListener('click', () => {
     let password = alertPasswordInput.value;
     socket.emit('checkPassword', { password: password, type: 'alert' });
 });
+submitUserInfoButton.addEventListener('click', () => {
+    let userInfo = {
+        treasureName: treasureName.value,
+        name: userName.value,
+        address: userAddress.value,
+        age: userAge.value,
+        schoolName: schoolName.value,
+        schoolTEL: schoolTEL.value,
+        dream: userDream.value
+    };
+    socket.emit('submitUserInfo', userInfo);
+    userInfoForm.classList.add('hidden');
+    getItemButton.disabled = false;
+    alert('thanks to Input.');
+});
 getItemButton.addEventListener('click', () => {
     let nextModal = allModals.find(modal => modal.takenBy === null);
     if(nextModal) {
@@ -59,16 +83,17 @@ socket.on('connect', () => {
 });
 socket.on('passwordResult', (result) => {
     if(result.success) {
-        if(isInitialLogin) {
+        if(result.type === 'initial') {
             loginForm.classList.add('hidden');
             gameArea.classList.remove('hidden');
             myItemsContainer.classList.remove('hidden');
             initializeGame();
-            isInitialLogin = false;
-        } else {
-            loginForm.classList.add = 'hidden';
-            customAlert.classList.add = 'hidden';
+        } else if (result.type === 'main_intermission') {
+            loginForm.classList.add('hidden');
             getItemButton.disabled = false;
+        } else if (result.type === 'alert') {
+            customAlert.classList.add('hidden');
+            userInfoForm.classList.remove('hidden');
         }
         passwordInput.value = '';
         alertPasswordInput.value = '';
