@@ -18,7 +18,7 @@ let backToTopButton = document.getElementById('back-to-top-button');
 let customAlert = document.getElementById('custom-alert');
 let alertPasswordInput = document.getElementById('alert-password-input');
 let alertLoginButton = document.getElementById('alert-login-button');
-let userInfoCountainer = document.getElementById('user-info-countainer');
+let userInfoContainer = document.getElementById('user-info-container');
 let treasureName = document.getElementById('treasure-name');
 let userName = document.getElementById('user-name');
 let userAddress = document.getElementById('user-address');
@@ -67,7 +67,7 @@ submitUserInfoButton.addEventListener('click', () => {
         dream: userDream.value
     };
     socket.emit('submitUserInfo', userInfo);
-    userInfoCountainer.classList.add('hidden');
+    userInfoContainer.classList.add('hidden');
     getItemButton.disabled = false;
     getItemButton.focus();
     treasureName.value = '';
@@ -80,11 +80,13 @@ submitUserInfoButton.addEventListener('click', () => {
     alert('thanks to Input. Next treasure is collecting.');
 });
 backToTopButton.addEventListener('click', () => {
-    let targetForm = document.getElementById('password-input');
-    if(targetForm) {
-        targetForm.focus();
-        targetForm.scrollIntoView({ behavior: 'smooth' });
-    }
+    window.scrollTo({ top:0, behavior: 'smooth' });
+    setTimeout(() => {
+        let targetForm = document.getElementById('password-input');
+        if(targetForm) {
+            targetForm.focus({ preventScroll: true });
+        }
+    }, 3000);
 });
 getItemButton.addEventListener('click', () => {
     let nextModal = allModals.find(modal => modal.takenBy === null);
@@ -110,8 +112,8 @@ socket.on('passwordResult', (result) => {
             getItemButton.disabled = false;
         } else if (result.type === 'alert') {
             customAlert.classList.add('hidden');
-            userInfoCountainer.classList.remove('hidden');
-            userInfoCountainer.scrollIntoView({ behavior: 'smooth' });
+            userInfoContainer.classList.remove('hidden');
+            userInfoContainer.scrollIntoView({ behavior: 'smooth' });
             treasureName.focus();
         }
         passwordInput.value = '';
@@ -177,8 +179,8 @@ function updateRemainingCount() {
 
 function updateMyItemsList() {
     let headerContainer = myItemsContainer.querySelector('.my-items-header');
-    if(headerContainer) {
-        console.error('.my-items-header is nothing.');
+    if(!headerContainer) {
+        console.error(`can't find .my-items-header.`);
         return;
     }
     let existingGrid = myItemsContainer.querySelector('.items-grid');
