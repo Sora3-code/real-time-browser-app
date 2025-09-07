@@ -32,10 +32,10 @@ let submitUserInfoButton = document.getElementById('submit-user-info');
 let myId = '';
 //-----------------------------------------------------------------------
 
-let allModals = [];
+let myTakenModalIds = JSON.parse(localStorage.getItem('myTakenModalIds')) || [];
 //-----------------------------------------------------------------------
 
-let myTakenModals = [];
+let allModals = [];
 //-----------------------------------------------------------------------
 
 let isInitialLogin = true;
@@ -129,9 +129,17 @@ socket.on('passwordResult', (result) => {
 function initializeGame() {
     socket.on('initialModals', (initialModals) => {
         allModals = initialModals;
-        myTakenModals = allModals.filter(m => m.takenBy === myId);
+        let myTakenModals = allModals.filter(m => myTakenModalIds.includes(m.id));
+        allModals.forEach(serverModal => {
+            if(serverModal.takenBy && serverModal.takenBy !== myId) {
+                let localModal = myTakenModals.find(m => m.id === serverModal.id);
+                if(!localModal) {
+    
+                }
+            }
+        });
         updateRemainingCount();
-        updateMyItemsList();
+        updateMyItemsList(myTakenModals);
     });
     socket.on('modalTaken', ({modalId, userId}) => {
         console.log(`user ${userId} is taked modal ${modalId}.`);
@@ -139,8 +147,10 @@ function initializeGame() {
         if(takenModal) {
             takenModal.takenBy = userId;
             if(userId === myId) {
-                myTakenModals.push(takenModal);
-                updateMyItemsList();
+                myTakenModalIds.push(takenModal.id);
+                localStorage.setItem('myTakenModalIds', JSON.stringify(myTakenModalIds));
+                let myTakenModals = allModals.filter(m => myTakenModalIds.includes(m.id));
+                updateMyItemsList(myTakenModals);
                 let newCardElement = document.getElementById('modal-card-' + takenModal.id);
                 if(newCardElement) {
                     newCardElement.focus();
@@ -177,7 +187,7 @@ function updateRemainingCount() {
 };
 //-----------------------------------------------------------------------
 
-function updateMyItemsList() {
+function updateMyItemsList(myTakenModals) {
     let headerContainer = myItemsContainer.querySelector('.my-items-header');
     if(!headerContainer) {
         console.error(`can't find .my-items-header.`);
