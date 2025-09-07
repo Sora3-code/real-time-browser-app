@@ -14,10 +14,11 @@ let gameArea = document.getElementById('game-area');
 let remainingCountElement = document.getElementById('remaining-count');
 let getItemButton = document.getElementById('get-item-button');
 let myItemsContainer = document.getElementById('my-items');
+let backToTopButton = document.getElementById('back-to-top-button');
 let customAlert = document.getElementById('custom-alert');
 let alertPasswordInput = document.getElementById('alert-password-input');
 let alertLoginButton = document.getElementById('alert-login-button');
-let userInfoForm = document.getElementById('user-info-form');
+let userInfoCountainer = document.getElementById('user-info-countainer');
 let treasureName = document.getElementById('treasure-name');
 let userName = document.getElementById('user-name');
 let userAddress = document.getElementById('user-address');
@@ -66,9 +67,24 @@ submitUserInfoButton.addEventListener('click', () => {
         dream: userDream.value
     };
     socket.emit('submitUserInfo', userInfo);
-    userInfoForm.classList.add('hidden');
+    userInfoCountainer.classList.add('hidden');
     getItemButton.disabled = false;
-    alert('thanks to Input.');
+    getItemButton.focus();
+    treasureName.value = '';
+    userName.value = '';
+    userAddress.value = '';
+    userAge.value = '';
+    schoolName.value = '';
+    schoolTEL.value = '';
+    userDream.value = '';
+    alert('thanks to Input. Next treasure is collecting.');
+});
+backToTopButton.addEventListener('click', () => {
+    let targetForm = document.getElementById('password-input');
+    if(targetForm) {
+        targetForm.focus();
+        targetForm.scrollIntoView({ behavior: 'smooth' });
+    }
 });
 getItemButton.addEventListener('click', () => {
     let nextModal = allModals.find(modal => modal.takenBy === null);
@@ -94,7 +110,9 @@ socket.on('passwordResult', (result) => {
             getItemButton.disabled = false;
         } else if (result.type === 'alert') {
             customAlert.classList.add('hidden');
-            userInfoForm.classList.remove('hidden');
+            userInfoCountainer.classList.remove('hidden');
+            userInfoCountainer.scrollIntoView({ behavior: 'smooth' });
+            treasureName.focus();
         }
         passwordInput.value = '';
         alertPasswordInput.value = '';
@@ -121,7 +139,12 @@ function initializeGame() {
             if(userId === myId) {
                 myTakenModals.push(takenModal);
                 updateMyItemsList();
+                let newCardElement = document.getElementById('modal-card-' + takenModal.id);
+                if(newCardElement) {
+                    newCardElement.focus();
+                }
                 if(takenModal.isImportant) {
+                    getItemButton.disabled = true;
                     setTimeout(() => {
                         customAlert.classList.remove('hidden');
                     }, 3000);
@@ -153,17 +176,34 @@ function updateRemainingCount() {
 //-----------------------------------------------------------------------
 
 function updateMyItemsList() {
-    myItemsContainer.innerHTML = '<h2>Your Get Items.</h2>';
-    if(myTakenModals.length === 0) {
-        myItemsContainer.innerHTML += '<p>not Items.</p>';
+    let headerContainer = myItemsContainer.querySelector('.my-items-header');
+    if(headerContainer) {
+        console.error('.my-items-header is nothing.');
         return;
     }
+    let existingGrid = myItemsContainer.querySelector('.items-grid');
+    if(existingGrid) {
+        existingGrid.remove();
+    }
+    if(myTakenModals.length === 0) {
+        myItemsContainer.querySelector('p')?.remove();
+        let p = document.createElement('p');
+        p.textContent = 'not items.';
+        myItemsContainer.appendChild(p);
+        backToTopButton.classList.add('hidden');
+        return;
+    } else {
+        myItemsContainer.querySelector('p')?.remove();
+    }
+    backToTopButton.classList.remove('hidden');
     let itemsGrid = document.createElement('div');
     itemsGrid.className = 'items-grid';
     myTakenModals.sort((a, b) => a.id - b.id);
     myTakenModals.forEach(modal => {
         let itemcard = document.createElement('div');
         itemcard.className = 'item-card';
+        itemcard.id = 'modal-card-' + modal.id;
+        itemcard.tabIndex = -1;
         itemcard.innerHTML = `<img src="${modal.image}"><p>${modal.text}</p>`;
         itemsGrid.appendChild(itemcard);
     });
