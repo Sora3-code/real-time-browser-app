@@ -5,6 +5,9 @@ body {
 .hidden {
     display: none;
 }
+#all-delete-button {
+    margin-bottom: 15px;
+}
 #start-button {
     padding: 10px 15px;
     cursor: pointer;

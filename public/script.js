@@ -4,6 +4,7 @@ let socket = io();  //localhost用
 //let socket = io('https://real-time-browser-app.onrender.com'); //render用
 //-----------------------------------------------------------------------
 
+let allDeleteButton = document.getElementById('all-delete-button');
 let startButton = document.getElementById('start-button');
 let loginForm = document.getElementById('login-form');
 let initialLoginTitle = document.getElementById('initial-login-title');
@@ -40,12 +41,24 @@ let allModals = [];
 
 let isInitialLogin = true;
 //-----------------------------------------------------------------------
+
+allDeleteButton.addEventListener('click', () => {
+    if(confirm('do you really delete everything?')) {
+        localStorage.removeItem('myTakenModalIds');
+        location.reload();
+        alert('deleted.');
+    }
+});
+//-----------------------------------------------------------------------
 //Game start.
 //-----------------------------------------------------------------------
 
 startButton.addEventListener('click', () => {
     startButton.classList.add('hidden');
     loginForm.classList.remove('hidden');
+    setTimeout(() => {
+        passwordInput.focus();
+    }, 1000);
 });
 loginButton.addEventListener('click', () => {
     let password = passwordInput.value;
@@ -77,7 +90,7 @@ submitUserInfoButton.addEventListener('click', () => {
     schoolName.value = '';
     schoolTEL.value = '';
     userDream.value = '';
-    alert('thanks to Input. Next treasure is collecting.');
+    alert('thank you for your Input. Please Get the following treasure.');
 });
 backToTopButton.addEventListener('click', () => {
     window.scrollTo({ top:0, behavior: 'smooth' });
@@ -130,14 +143,6 @@ function initializeGame() {
     socket.on('initialModals', (initialModals) => {
         allModals = initialModals;
         let myTakenModals = allModals.filter(m => myTakenModalIds.includes(m.id));
-        allModals.forEach(serverModal => {
-            if(serverModal.takenBy && serverModal.takenBy !== myId) {
-                let localModal = myTakenModals.find(m => m.id === serverModal.id);
-                if(!localModal) {
-    
-                }
-            }
-        });
         updateRemainingCount();
         updateMyItemsList(myTakenModals);
     });
