@@ -12,17 +12,20 @@
 <h1>Earth treasure(*^^)v</h1>
 <!---------------------------------------------------------------------------------->
 
-<button id="all-delete-button" style="background-color: #ff4757;">All Delete (for test)</button>
-<!---------------------------------------------------------------------------------->
-
-<button id="start-button">start</button>
-<!---------------------------------------------------------------------------------->
-
-<div id="login-form" class="hidden">
-    <h2 id="initial-login-title">Input password Please.</h2>
-    <h2 id="intermission-title" class="hidden">next Item Get pass.</h2>
-    <input type="password" id="password-input" placeholder="password">
-    <button id="login-button">login</button>
+<div id="auth-container">
+    <h2>welcome.</h2>
+    <div id="register-form" class="hidden">
+        <input type="text" id="register-username" placeholder="name(ID)">
+        <input type="password" id="register-password" placeholder="password">
+        <button id="register-button">Register</button>
+        <p>Do you already have an account?<a href="#" id="show-login">login</a></p>
+    </div>
+    <div id="login-form-main">
+        <input type="text" id="login-username" placeholder="name(ID)">
+        <input type="password" id="login-password" placeholder="password">
+        <button id="login-button-main">login</button>
+        <p>Is this your first time?<a href="#" id="show-register">Register</a></p>
+    </div>
 </div>
 <!---------------------------------------------------------------------------------->
 
@@ -67,6 +70,9 @@
         <button id="submit-user-info">thanks.We wish you happiness (^^)</button>
     </div>
 </div>
+<!---------------------------------------------------------------------------------->
+
+<button id="all-delete-button" style="background-color: #ff4757;">All Delete (for test)</button>
 <!---------------------------------------------------------------------------------->
 
 <script src="/socket.io/socket.io.js"></script>

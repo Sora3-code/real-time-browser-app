@@ -5,16 +5,33 @@ body {
 .hidden {
     display: none;
 }
-#all-delete-button {
-    margin-bottom: 15px;
+#auth-container {
+    background: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    width: 90%;
+    max-width: 400px;
 }
-#start-button {
-    padding: 10px 15px;
+#auth-container input {
+    width: calc(100% - 20px);
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+#auth-container button {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    background-color: #007bff;
+    color: white;
+    border-radius: 4px;
     cursor: pointer;
-    background-color: #95a5fc;
 }
-#start-button:hover {
-    background-color: #7589ff;
+#auth-container p {
+    margin-top: 15px;
+    font-size: 0.9em;
 }
 #game-area {
     margin-bottom: 20px;
@@ -156,4 +173,7 @@ body {
 }
 .user-info-box button:hover {
     background-color: #218838;
+}
+#all-delete-button {
+    margin-bottom: 15px;
 }

@@ -4,13 +4,17 @@ let socket = io();  //localhost用
 //let socket = io('https://real-time-browser-app.onrender.com'); //render用
 //-----------------------------------------------------------------------
 
-let allDeleteButton = document.getElementById('all-delete-button');
-let startButton = document.getElementById('start-button');
-let loginForm = document.getElementById('login-form');
-let initialLoginTitle = document.getElementById('initial-login-title');
-let intermissionTitle = document.getElementById('intermission-title');
-let passwordInput = document.getElementById('password-input');
-let loginButton = document.getElementById('login-button');
+let authContainer = document.getElementById('auth-container');
+let registerForm = document.getElementById('register-form');
+let loginFormMain = document.getElementById('login-form-main');
+let registerUsernameInput = document.getElementById('register-username');
+let registerPasswordInput = document.getElementById('register-password');
+let registerButton = document.getElementById('register-button');
+let loginUsernameInput = document.getElementById('login-username');
+let loginPasswordInput = document.getElementById('login-password');
+let loginButtonMain = document.getElementById('login-button-main');
+let showLoginLink = document.getElementById('show-login');
+let showRegisterLink = document.getElementById('show-register');
 let gameArea = document.getElementById('game-area');
 let remainingCountElement = document.getElementById('remaining-count');
 let getItemButton = document.getElementById('get-item-button');
@@ -28,28 +32,95 @@ let schoolName = document.getElementById('school-name');
 let schoolTEL = document.getElementById('school-tel');
 let userDream = document.getElementById('user-dream');
 let submitUserInfoButton = document.getElementById('submit-user-info');
+let allDeleteButton = document.getElementById('all-delete-button');
 //-----------------------------------------------------------------------
 
-let myId = '';
-//-----------------------------------------------------------------------
-
-let myTakenModalIds = JSON.parse(localStorage.getItem('myTakenModalIds')) || [];
+let loggedInUser = null;
 //-----------------------------------------------------------------------
 
 let allModals = [];
 //-----------------------------------------------------------------------
 
-let isInitialLogin = true;
+let myTakenModals = [];
 //-----------------------------------------------------------------------
 
-allDeleteButton.addEventListener('click', () => {
-    if(confirm('do you really delete everything?')) {
-        localStorage.removeItem('myTakenModalIds');
-        location.reload();
-        alert('deleted.');
+showLoginLink.addEventListener('click', (e) => {
+    e.preventDefault();
+    registerForm.classList.add('hidden');
+    loginFormMain.classList.remove('hidden');    
+});
+//-----------------------------------------------------------------------
+
+showRegisterLink.addEventListener('click', (e) => {
+    e.preventDefault();
+    loginFormMain.classList.add('hidden');
+    registerForm.classList.remove('hidden');
+});
+//-----------------------------------------------------------------------
+
+registerButton.addEventListener('click', () => {
+    let username = registerUsernameInput.value.trim();
+    let password = registerPasswordInput.value.trim();
+    if(username && password) {
+        socket.emit('register', { username, password });
     }
 });
 //-----------------------------------------------------------------------
+
+loginButtonMain.addEventListener('click', () => {
+    let username = loginUsernameInput.value.trim();
+    let password = loginPasswordInput.value.trim();
+    if(username && password) {
+        socket.emit('login', { username, password });
+    }
+});
+//-----------------------------------------------------------------------
+
+socket.on('registerResult', (result) => {
+    if(result.success) {
+        alert('Registration has been completed. Please login.');
+        showLoginLink.click();
+    } else {
+        alert(`Registration Error: ${result.message}`);
+    }
+});
+//-----------------------------------------------------------------------
+
+socket.on('loginResult', (result) => {
+    if(result.success) {
+        loggedInUser = result.username;
+        authContainer.classList.add('hidden');
+        gameArea.classList.remove('hidden');
+        myItemsContainer.classList.remove('hidden');
+        socket.emit('checkPassword', { password: 'hope', type: 'initial' });
+    } else {
+        alert(`Login Error: ${result.message }`);
+    }
+});
+//-----------------------------------------------------------------------
+
+getItemButton.addEventListener('click', () => {
+    let nextModal = allModals.find(modal => modal.takenBy === null);
+    if(nextModal && loggedInUser) {
+        getItemButton.disabled = true;
+        socket.emit('takeModal', { modalId: nextModal.id, username: loggedInUser });
+    }
+});
+//-----------------------------------------------------------------------
+
+function initializeGame(initialModals, userTakenModalIds) {
+    allModals = initialModals;
+    allModals.forEach(modal => {
+        if(modal.takenBy) {
+
+        }
+    });
+    myTakenModals = allModals.filter(m => userTakenModalIds.includes(m.id));
+    updateRemainingCount();
+    updateMyItemsList(myTakenModals);
+}
+//-----------------------------------------------------------------------
+
 //Game start.
 //-----------------------------------------------------------------------
 
@@ -228,6 +299,10 @@ function updateMyItemsList(myTakenModals) {
 };
 //-----------------------------------------------------------------------
 
-
-
-
+allDeleteButton.addEventListener('click', () => {
+    if(confirm('do you really delete everything?')) {
+        localStorage.removeItem('myTakenModalIds');
+        location.reload();
+        alert('deleted.');
+    }
+});

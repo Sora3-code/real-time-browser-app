@@ -34,12 +34,65 @@ let modals = [
 ];
 //-----------------------------------------------------------------------
 
+let USER_FILE = './user.json';
+let users = {};
+//-----------------------------------------------------------------------
+
+function loadUsers() {
+    if(fs.existsSync(USER_FILE)) {
+        let data = fs.readFileSync(USER_FILE);
+        users = JSON.parse(data);
+        console.log('User data loaded.');
+    } else {
+        console.log('No user dataFile found, starting fresh.');
+    }
+}
+//-----------------------------------------------------------------------
+
+function saveUsers() {
+    fs.writeFileSync(USER_FILE, JSON.stringify(users, null, 2), (err) => {
+        if(err) console.error('Error saving user data:', err);
+    });
+}
+//-----------------------------------------------------------------------
+
+loadUsers();
+//-----------------------------------------------------------------------
+
 app.use(express.static('public'));
 //-----------------------------------------------------------------------
 
 io.on('connection', (socket) => {
     console.log(`user is connected: ${socket.id}` );
-    socket.on('checkPassword', ({ password, type }) => {
+    socket.on('register', ({ username, password }) => {
+        if(users[username]) {
+            socket.emit('registerResult', { success: false, message: 'This name is already in use.' });
+        } else {
+            users[username] = { password: password, takenModals: [] };
+            saveUsers();
+            socket.emit('registerResult', { success: true });
+        }
+    });
+    socket.on('login', ({ username, password }) => {
+        let user = users[username];
+        if(user && user.password === password) {
+            socket.emit('loginResult', { success: true, username: username, takenmodals: user.takenModals });
+            console.log(`${username} logged in.`);
+        } else {
+            socket.emit('loginResult', { success: false, message: 'the name or password is incorrect.' });
+        }
+    });
+    socket.on('takeModal', ({ modalId, username }) => {
+        let modal = modals.find(m => m.id === modalId);
+        let user = users[username];
+        if(modal && modal.takenBy === null && user) {
+            modal.takenBy = username;
+            saveUsers();
+            console.log(`user ${username} got modal ${modalId}.`);
+            io.emit('modalTaken', { modalId: modalId, userId: username });
+        }
+    });
+    socket.on('checkPassword', ({ password: type }) => {
         let isCorrect = false;
         if(type === 'initial' && password === INITIAL_PASSWORD) {
             isCorrect = true;
@@ -55,26 +108,6 @@ io.on('connection', (socket) => {
             }
         } else {
             socket.emit('passwordResult', { success: false });
-        }
-    });
-    socket.on('takeModal', (modalId) => {
-        let modal = modals.find(m => m.id === modalId);
-        if (modal && modal.takenBy === null) {
-            modal.takenBy = socket.id;
-            console.log(`user ${socket.id} is modal ${modalId} Get.`);
-            io.emit('modalTaken', { modalId: modalId, userId: socket.id });
-            if(modal.isImportant) {
-                let now = new Date();
-                let timestamp = now.toLocaleString('ja-JP');
-                let logMessage = `${timestamp} - ${modal.text.replace(/<[^>]*>/g, ' ')}\n`;
-                fs.appendFile('important_items.log', logMessage, (err) => {
-                    if(err) {
-                        console.error('writing Error.', err);
-                    } else {
-                        console.log('Important modal log is success.');
-                    }
-                });
-            }
         }
     });
     socket.on('submitUserInfo', (userInfo) => {
