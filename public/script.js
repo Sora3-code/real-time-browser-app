@@ -76,29 +76,6 @@ loginButtonMain.addEventListener('click', () => {
 });
 //-----------------------------------------------------------------------
 
-socket.on('registerResult', (result) => {
-    if(result.success) {
-        alert('Registration has been completed. Please login.');
-        showLoginLink.click();
-    } else {
-        alert(`Registration Error: ${result.message}`);
-    }
-});
-//-----------------------------------------------------------------------
-
-socket.on('loginResult', (result) => {
-    if(result.success) {
-        loggedInUser = result.username;
-        authContainer.classList.add('hidden');
-        gameArea.classList.remove('hidden');
-        myItemsContainer.classList.remove('hidden');
-        socket.emit('checkPassword', { password: 'hope', type: 'initial' });
-    } else {
-        alert(`Login Error: ${result.message }`);
-    }
-});
-//-----------------------------------------------------------------------
-
 getItemButton.addEventListener('click', () => {
     let nextModal = allModals.find(modal => modal.takenBy === null);
     if(nextModal && loggedInUser) {
@@ -108,38 +85,30 @@ getItemButton.addEventListener('click', () => {
 });
 //-----------------------------------------------------------------------
 
-function initializeGame(initialModals, userTakenModalIds) {
-    allModals = initialModals;
-    allModals.forEach(modal => {
-        if(modal.takenBy) {
-
-        }
-    });
-    myTakenModals = allModals.filter(m => userTakenModalIds.includes(m.id));
-    updateRemainingCount();
-    updateMyItemsList(myTakenModals);
-}
-//-----------------------------------------------------------------------
-
-//Game start.
-//-----------------------------------------------------------------------
-
-startButton.addEventListener('click', () => {
-    startButton.classList.add('hidden');
-    loginForm.classList.remove('hidden');
+backToTopButton.addEventListener('click', () => {
+    window.scrollTo({ top:0, behavior: 'smooth' });
     setTimeout(() => {
-        passwordInput.focus();
-    }, 1000);
+        let targetForm = document.getElementById('password-input');
+        if(targetForm) {
+            targetForm.focus({ preventScroll: true });
+        }
+    }, 3000);
 });
+//-----------------------------------------------------------------------
+
 loginButton.addEventListener('click', () => {
     let password = passwordInput.value;
     let type = isInitialLogin ? 'initial' : 'main_intermission';
     socket.emit('checkPassword', { password: password, type: type });
 });
+//-----------------------------------------------------------------------
+
 alertLoginButton.addEventListener('click', () => {
     let password = alertPasswordInput.value;
     socket.emit('checkPassword', { password: password, type: 'alert' });
 });
+//-----------------------------------------------------------------------
+
 submitUserInfoButton.addEventListener('click', () => {
     let userInfo = {
         treasureName: treasureName.value,
@@ -163,26 +132,90 @@ submitUserInfoButton.addEventListener('click', () => {
     userDream.value = '';
     alert('thank you for your Input. Please Get the following treasure.');
 });
-backToTopButton.addEventListener('click', () => {
-    window.scrollTo({ top:0, behavior: 'smooth' });
-    setTimeout(() => {
-        let targetForm = document.getElementById('password-input');
-        if(targetForm) {
-            targetForm.focus({ preventScroll: true });
-        }
-    }, 3000);
+//-----------------------------------------------------------------------
+
+socket.on('connect', () => {
+    console.log(`server connected. Your ID: ${socket.id}.`);
 });
-getItemButton.addEventListener('click', () => {
-    let nextModal = allModals.find(modal => modal.takenBy === null);
-    if(nextModal) {
-        getItemButton.disabled = true;
-        socket.emit('takeModal', nextModal.id);
+//-----------------------------------------------------------------------
+
+socket.on('registerResult', (result) => {
+    if(result.success) {
+        alert('Registration has been completed. Please login.');
+        showLoginLink.click();
+    } else {
+        alert(`Registration Error: ${result.message}`);
     }
 });
-socket.on('connect', () => {
-    myId = socket.id;
-    console.log(`server connected. Your ID: ${myId}.`);
+//-----------------------------------------------------------------------
+
+socket.on('loginResult', (result) => {
+    if(result.success) {
+        loggedInUser = result.username;
+        authContainer.classList.add('hidden');
+        gameArea.classList.remove('hidden');
+        myItemsContainer.classList.remove('hidden');
+        socket.emit('checkPassword', { password: 'hope', type: 'initial' });
+    } else {
+        alert(`Login Error: ${result.message }`);
+    }
 });
+//-----------------------------------------------------------------------
+
+
+//-----------------------------------------------------------------------
+
+function initializeGame(initialModals, userTakenModalIds) {
+    allModals = initialModals;
+    allModals.forEach(modal => {
+        if(modal.takenBy) {
+
+        }
+    });
+    myTakenModals = allModals.filter(m => userTakenModalIds.includes(m.id));
+    updateRemainingCount();
+    updateMyItemsList(myTakenModals);
+}
+//-----------------------------------------------------------------------
+
+socket.on('initialModals', (initialModals) => {
+    socket.once('loginResult', (result) => {
+        if(result.success) {
+            initializeGame(initialModals, result.takenModals);
+        }
+    });
+    let username = loginUsernameInput.value.trim();
+    let password = loginPasswordInput.value.trim();
+    socket.emit('login', { username, password });
+});
+//-----------------------------------------------------------------------
+
+socket.on('modalTaken', ({ modalId, userId }) => {
+    console.log(`user ${userId} took modal ${modalId}.`);
+    let takenModal = allModals.find(m => m.id === modalId);
+    if(takenModal) {
+        takenModal.takenBy = userId;
+        if(userId === loggedInUser) {
+            myTakenModals.push(takenModal);
+            updateMyItemsList();
+            let newCardElement = document.getElementById('modal-card-' + takenModal.id);
+                if(newCardElement) {
+                    newCardElement.focus();
+                }
+                if(takenModal.isImportant) {
+                    getItemButton.disabled = true;
+                    setTimeout(() => {
+                        customAlert.classList.remove('hidden');
+                    }, 3000);
+                } else if (allModals.filter(modal => modal.takenBy === null).length > 0) {
+                    showIntermissionPasswordForm();
+                }
+        }
+        updateRemainingCount();
+    }
+});
+//-----------------------------------------------------------------------
+
 socket.on('passwordResult', (result) => {
     if(result.success) {
         if(result.type === 'initial') {
@@ -215,51 +248,8 @@ function initializeGame() {
         allModals = initialModals;
         let myTakenModals = allModals.filter(m => myTakenModalIds.includes(m.id));
         updateRemainingCount();
-        updateMyItemsList(myTakenModals);
+        updateMyItemsList();
     });
-    socket.on('modalTaken', ({modalId, userId}) => {
-        console.log(`user ${userId} is taked modal ${modalId}.`);
-        let takenModal = allModals.find(m => m.id === modalId);
-        if(takenModal) {
-            takenModal.takenBy = userId;
-            if(userId === myId) {
-                myTakenModalIds.push(takenModal.id);
-                localStorage.setItem('myTakenModalIds', JSON.stringify(myTakenModalIds));
-                let myTakenModals = allModals.filter(m => myTakenModalIds.includes(m.id));
-                updateMyItemsList(myTakenModals);
-                let newCardElement = document.getElementById('modal-card-' + takenModal.id);
-                if(newCardElement) {
-                    newCardElement.focus();
-                }
-                if(takenModal.isImportant) {
-                    getItemButton.disabled = true;
-                    setTimeout(() => {
-                        customAlert.classList.remove('hidden');
-                    }, 3000);
-                } else if (allModals.filter(modal => modal.takenBy === null).length > 0) {
-                    showIntermissionPasswordForm();
-                }
-            }
-            updateRemainingCount();   
-        }
-    });  
-}
-//-----------------------------------------------------------------------
-
-function showIntermissionPasswordForm() {
-    initialLoginTitle.classList.add('hidden');
-    intermissionTitle.classList.remove('hidden');
-    loginForm.classList.remove('hidden');
-}
-//-----------------------------------------------------------------------
-
-function updateRemainingCount() {
-    let remaining = allModals.filter(modal => modal.takenBy === null).length;
-    remainingCountElement.textContent = `残り: ${remaining}個.`;
-    if(remaining === 0) {
-        getItemButton.disabled = true;
-        getItemButton.textContent = '終了';
-    }
 };
 //-----------------------------------------------------------------------
 
@@ -299,6 +289,23 @@ function updateMyItemsList(myTakenModals) {
 };
 //-----------------------------------------------------------------------
 
+function updateRemainingCount() {
+    let remaining = allModals.filter(modal => modal.takenBy === null).length;
+    remainingCountElement.textContent = `残り: ${remaining}個.`;
+    if(remaining === 0) {
+        getItemButton.disabled = true;
+        getItemButton.textContent = '終了';
+    }
+};
+//-----------------------------------------------------------------------
+
+function showIntermissionPasswordForm() {
+    initialLoginTitle.classList.add('hidden');
+    intermissionTitle.classList.remove('hidden');
+    loginForm.classList.remove('hidden');
+}
+//-----------------------------------------------------------------------
+
 allDeleteButton.addEventListener('click', () => {
     if(confirm('do you really delete everything?')) {
         localStorage.removeItem('myTakenModalIds');
@@ -306,3 +313,4 @@ allDeleteButton.addEventListener('click', () => {
         alert('deleted.');
     }
 });
+//-----------------------------------------------------------------------
