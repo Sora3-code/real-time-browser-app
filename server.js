@@ -1,24 +1,20 @@
 //-----------------------------------------------------------------------
-
-let fs = require('fs');
-let express = require('express');
-let http = require('http');
-let { Server } = require("socket.io");
+// Setup
 //-----------------------------------------------------------------------
+const fs = require('fs');
+const express = require('express');
+const http = require('http');
+const { Server } = require("socket.io");
 
-let app = express();
-let server = http.createServer(app);
-let io = new Server(server);
-//-----------------------------------------------------------------------
+const app = express();
+const server = http.createServer(app);
+const io = new Server(server);
 
-let INITIAL_PASSWORD = 'hope';
 //-----------------------------------------------------------------------
-
-let MAIN_INTERMISSION_PASSWORD = 'pleasure';
+// Game Data & Passwords
 //-----------------------------------------------------------------------
-
-let ALERT_PASSWORD = 'happiness';
-//-----------------------------------------------------------------------
+const MAIN_INTERMISSION_PASSWORD = 'pleasure';
+const ALERT_PASSWORD = 'happiness';
 
 let modals = [
     { id: 0, image: 'images/1.jpg', text: '------- Ishiba Shigeru -------<br>---------- 自然との共生を大事にする事 ----------', takenBy: null, isImportant: false},
@@ -28,122 +24,164 @@ let modals = [
     { id: 4, image: 'images/5.jpg', text: '-------  -------<br>----------  ----------', takenBy: null, isImportant: false},
     { id: 5, image: 'images/6.jpg', text: '-------  -------<br>----------  ----------', takenBy: null, isImportant: false},
     { id: 6, image: 'images/7.JPG', text: '-------  -------<br>----------  ----------', takenBy: null, isImportant: false},
-    { id: 7, image: 'images/', text: '', takenBy: null, isImportant: false},
-    { id: 8, image: 'images/', text: '', takenBy: null, isImportant: false},
-    { id: 9, image: 'images/', text: '', takenBy: null, isImportant: false}, //10
+    { id: 7, image: 'images/8.jpg', text: '-------  -------<br>----------  ----------', takenBy: null, isImportant: false},
+    { id: 8, image: 'images/9.jpg', text: '-------  -------<br>----------  ----------', takenBy: null, isImportant: false},
+    { id: 9, image: 'images/10.jpg', text: '-------  -------<br>----------  ----------', takenBy: null, isImportant: false},
 ];
-//-----------------------------------------------------------------------
 
-let USER_FILE = './user.json';
-let users = {};
 //-----------------------------------------------------------------------
+// User Database (JSON file)
+//-----------------------------------------------------------------------
+const USERS_FILE = './users.json';
+let users = {}; // This object will hold all user data
 
+// Function to load users from the JSON file
 function loadUsers() {
-    if(fs.existsSync(USER_FILE)) {
-        let data = fs.readFileSync(USER_FILE);
-        users = JSON.parse(data);
-        console.log('User data loaded.');
-    } else {
-        console.log('No user dataFile found, starting fresh.');
+    try {
+        if (fs.existsSync(USERS_FILE)) {
+            const data = fs.readFileSync(USERS_FILE);
+            users = JSON.parse(data);
+            console.log('User data loaded successfully.');
+            // Sync the main `modals` array with the loaded user data
+            for (const username in users) {
+                const user = users[username];
+                user.takenModals.forEach(modalId => {
+                    const modal = modals.find(m => m.id === modalId);
+                    if (modal) {
+                        modal.takenBy = username;
+                    }
+                });
+            }
+        } else {
+            console.log('No users.json file found. A new one will be created.');
+        }
+    } catch (err) {
+        console.error('Error loading or parsing users.json:', err);
     }
 }
-//-----------------------------------------------------------------------
 
+// Function to save the current user data to the JSON file
 function saveUsers() {
-    fs.writeFileSync(USER_FILE, JSON.stringify(users, null, 2), (err) => {
-        if(err) console.error('Error saving user data:', err);
+    fs.writeFile(USERS_FILE, JSON.stringify(users, null, 2), (err) => {
+        if (err) {
+            console.error('Error saving user data:', err);
+        }
     });
 }
-//-----------------------------------------------------------------------
 
+// Load users when the server starts
 loadUsers();
-//-----------------------------------------------------------------------
 
+//-----------------------------------------------------------------------
+// Middleware
+//-----------------------------------------------------------------------
 app.use(express.static('public'));
-//-----------------------------------------------------------------------
 
+//-----------------------------------------------------------------------
+// Socket.IO Connection Handling
+//-----------------------------------------------------------------------
 io.on('connection', (socket) => {
-    console.log(`user is connected: ${socket.id}` );
+    console.log(`User connected: ${socket.id}`);
+
+    // --- User Registration ---
     socket.on('register', ({ username, password }) => {
-        if(users[username]) {
-            socket.emit('registerResult', { success: false, message: 'This name is already in use.' });
+        if (users[username]) {
+            socket.emit('registerResult', { success: false, message: 'この名前は既に使用されています。' });
         } else {
             users[username] = { password: password, takenModals: [] };
             saveUsers();
             socket.emit('registerResult', { success: true });
+            console.log(`New user registered: ${username}`);
         }
     });
+
+    // --- User Login ---
     socket.on('login', ({ username, password }) => {
-        let user = users[username];
-        if(user && user.password === password) {
-            socket.emit('loginResult', { success: true, username: username, takenmodals: user.takenModals });
-            console.log(`${username} logged in.`);
+        const user = users[username];
+        if (user && user.password === password) {
+            // On successful login, send all necessary data to the client
+            socket.emit('loginResult', {
+                success: true,
+                username: username,
+                initialModals: modals, // The current state of ALL modals
+                userTakenModalIds: user.takenModals // The IDs of modals taken by THIS user
+            });
+            console.log(`User logged in: ${username}`);
         } else {
-            socket.emit('loginResult', { success: false, message: 'the name or password is incorrect.' });
+            socket.emit('loginResult', { success: false, message: '名前またはパスワードが間違っています。' });
         }
     });
+
+    // --- Taking a Modal ---
     socket.on('takeModal', ({ modalId, username }) => {
-        let modal = modals.find(m => m.id === modalId);
-        let user = users[username];
-        if(modal && modal.takenBy === null && user) {
-            modal.takenBy = username;
-            saveUsers();
-            console.log(`user ${username} got modal ${modalId}.`);
+        const modal = modals.find(m => m.id === modalId);
+        const user = users[username];
+
+        if (modal && user && modal.takenBy === null) {
+            modal.takenBy = username; // Assign modal to the user
+            user.takenModals.push(modal.id); // Add modal ID to user's list
+            saveUsers(); // Save the change to the file
+
             io.emit('modalTaken', { modalId: modalId, userId: username });
+            console.log(`User ${username} took modal ${modalId}`);
+
+            if (modal.isImportant) {
+                const now = new Date();
+                const timestamp = now.toLocaleString('ja-JP');
+                const logMessage = `${timestamp} - User: ${username} - Item: ${modal.text.replace(/<[^>]*>/g, ' ')}\n`;
+                fs.appendFile('important_items.log', logMessage, (err) => {
+                    if (err) console.error('Error writing to log:', err);
+                });
+            }
         }
     });
-    socket.on('checkPassword', ({ password: type }) => {
+
+    // --- In-game Password Checks ---
+    socket.on('checkPassword', ({ password, type }) => {
         let isCorrect = false;
-        if(type === 'initial' && password === INITIAL_PASSWORD) {
-            isCorrect = true;
-        } else if (type === 'main_intermission' && password === MAIN_INTERMISSION_PASSWORD) {
+        if (type === 'main_intermission' && password === MAIN_INTERMISSION_PASSWORD) {
             isCorrect = true;
         } else if (type === 'alert' && password === ALERT_PASSWORD) {
             isCorrect = true;
         }
-        if(isCorrect) {
+        
+        if (isCorrect) {
             socket.emit('passwordResult', { success: true, type: type });
-            if(type === 'initial') {
-                socket.emit('initialModals', modals);
-            }
         } else {
             socket.emit('passwordResult', { success: false });
         }
     });
+
+    // --- User Info Submission (for important modals) ---
     socket.on('submitUserInfo', (userInfo) => {
-        console.log('Recieved user info', userInfo);
-        let now = new Date();
-        let timestamp = now.toLocaleString('ja-JP');
-        let logMessage = 
-        `--- User Info Recieved: ${timestamp} ---
-        Treasure Name: ${userInfo.treasureName}
-        Name: ${userInfo.name}
-        Address: ${userInfo.address}
-        Age: ${userInfo.age}
-        School Name: ${userInfo.schoolName}
-        School TEL: ${userInfo.schoolTEL}
-        Dreame: ${userInfo.dream}
-        Socket ID: ${socket.id}
-        -----------------------------------------
-        `;
-        fs.appendFile('user-info-log', logMessage, (err) => {
-            if(err) {
-                console.error('Error writing user-info-log.:', err);
-            } else {
-                console.log('successfully wrote user-info-log.');
-            }
+        console.log('Received user info:', userInfo);
+        const now = new Date();
+        const timestamp = now.toLocaleString('ja-JP');
+        const logMessage = `
+--- User Info Received: ${timestamp} ---
+Treasure Name: ${userInfo.treasureName}
+Name: ${userInfo.name}
+Address: ${userInfo.address}
+Age: ${userInfo.age}
+School Name: ${userInfo.schoolName}
+School TEL: ${userInfo.schoolTEL}
+Dream: ${userInfo.dream}
+------------------------------------------\n`;
+        fs.appendFile('user_info.log', logMessage, (err) => {
+            if (err) console.error('Error writing user info to log:', err);
         });
     });
+
+    // --- Disconnection ---
     socket.on('disconnect', () => {
-        console.log(`user is disconnected: ${socket.id}`);
+        console.log(`User disconnected: ${socket.id}`);
     });
 });
-//-----------------------------------------------------------------------
 
-let PORT = process.env.PORT || 3000;
 //-----------------------------------------------------------------------
-
+// Start Server
+//-----------------------------------------------------------------------
+const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
-    console.log(`server start ${PORT} (*^^)v`);
+    console.log(`Server is running on port ${PORT} (*^^)v`);
 });
-//-----------------------------------------------------------------------
