@@ -13,13 +13,13 @@
     <div id="auth-container">
         <h2>ようこそ！</h2>
         <div id="register-form" class="hidden">
-            <input type="text" id="register-username" placeholder="名前 (ID)">
+            <input type="text" id="register-username" placeholder="名前 (ID)" autocomplete="off">
             <input type="password" id="register-password" placeholder="パスワード">
             <button id="register-button">登録する</button>
             <p>既にアカウントをお持ちですか？ <a href="#" id="show-login">ログイン</a></p>
         </div>
         <div id="login-form-main">
-            <input type="text" id="login-username" placeholder="名前 (ID)">
+            <input type="text" id="login-username" placeholder="名前 (ID)" autocomplete="off">
             <input type="password" id="login-password" placeholder="パスワード">
             <button id="login-button-main">ログイン</button>
             <p>初めてですか？ <a href="#" id="show-register">登録する</a></p>
@@ -44,6 +44,8 @@
         </div>
     </div>
     <button id="back-to-top-button" class="hidden">to TOP</button>
+
+    <button id="reset-my-modals-button">Reset My Items.</button>
 
     <div id="custom-alert" class="custom-alert-overlay hidden">
         <div class="custom-alert-box">

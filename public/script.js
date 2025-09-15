@@ -48,6 +48,8 @@ const schoolTelInput = document.getElementById('school-tel');
 const userDreamInput = document.getElementById('user-dream');
 const submitUserInfoButton = document.getElementById('submit-user-info');
 
+//delete modals
+const resetMyModalsButton = document.getElementById('reset-my-modals-button');
 //-----------------------------------------------------------------------
 // Global Variables
 //-----------------------------------------------------------------------
@@ -110,6 +112,12 @@ backToTopButton.addEventListener('click', () => {
             targetForm.focus({ preventScroll: true });
         }
     }, 1000);
+});
+
+resetMyModalsButton.addEventListener('click', () => {
+    if(loggedInUser && confirm('本当にあなたの取得済みの全てのモーダルをリセットしますか？')) {
+        socket.emit('resetMyModals', { username: loggedInUser });
+    }
 });
 
 // --- In-game Progression Passwords ---
@@ -232,6 +240,11 @@ socket.on('passwordResult', (result) => {
         passwordInput.value = '';
         alertPasswordInput.value = '';
     }
+});
+
+socket.on('resetComplete', () => {
+    alert('取得済みモーダルがリセットされました。ページをリロードします。');
+    location.reload();
 });
 
 //-----------------------------------------------------------------------

@@ -95,6 +95,23 @@ io.on('connection', (socket) => {
         }
     });
 
+    // --- 開発用 : user modals Reset code ---
+    socket.on('resetMyModals', ({ username }) => {
+        const user = users[username];
+        if(user) {
+            console.log(`Resetting modals for user: ${username}`);
+            const modalIdsToReset = [...user.takenModals];
+            user.takenModals = [];
+            modals.forEach(modal => {
+                if(modalIdsToReset.includes(modal.id)) {
+                    modal.takenBy = null;
+                }
+            });
+            saveUsers();
+            socket.emit('resetComplete');
+        }
+    });
+
     // --- User Login ---
     socket.on('login', ({ username, password }) => {
         const user = users[username];
