@@ -17,16 +17,26 @@ const MAIN_INTERMISSION_PASSWORD = 'pleasure';
 const ALERT_PASSWORD = 'happiness';
 
 let modals = [
-    { id: 0, image: 'images/1.jpg', text: '------- Ishiba Shigeru -------<br>---------- 自然との共生を大事にする事 ----------', takenBy: null, isImportant: false},
-    { id: 1, image: 'images/2.jpg', text: '------- Donald Trump -------<br>---------- the Earth is mankind\'s oldest best friend ----------', takenBy: null, isImportant: true},
-    { id: 2, image: 'images/3.jpg', text: '------- Suzuki Kenta -------<br>---------- 未来の地球を支えるもの ----------', takenBy: null, isImportant: false},
-    { id: 3, image: 'images/4.jpg', text: '------- Ado -------<br>---------- 歌い手にとっても、かけがえのない、すべて ----------', takenBy: null, isImportant: true},
-    { id: 4, image: 'images/5.jpg', text: '-------  -------<br>----------  ----------', takenBy: null, isImportant: false},
-    { id: 5, image: 'images/6.jpg', text: '-------  -------<br>----------  ----------', takenBy: null, isImportant: false},
-    { id: 6, image: 'images/7.JPG', text: '-------  -------<br>----------  ----------', takenBy: null, isImportant: false},
-    { id: 7, image: 'images/8.jpg', text: '-------  -------<br>----------  ----------', takenBy: null, isImportant: false},
-    { id: 8, image: 'images/9.jpg', text: '-------  -------<br>----------  ----------', takenBy: null, isImportant: false},
-    { id: 9, image: 'images/10.jpg', text: '-------  -------<br>----------  ----------', takenBy: null, isImportant: false},
+    { id: 0, image: 'images/IMG_2178.jpeg', text: '------- Donald Trump -------<br>---------- the Earth is mankind\'s oldest best friend ----------', takenBy: null, isImportant: true},
+    { id: 1, image: 'images/IMG_2176.jpeg', text: '------- Vladimir Vladimirovich Putin -------<br>---------- kindness are super civilized ----------', takenBy: null, isImportant: true},
+    { id: 2, image: 'images/IMG_2195.jpeg', text: '------- 習近平 -------<br>---------- the key to saving the Earth is<br>the coexistence of civilization and nature ----------', takenBy: null, isImportant: true},
+    { id: 3, image: 'images/4.jpg', text: '-------  -------<br>----------  ----------', takenBy: null, isImportant: true},
+    { id: 4, image: 'images/5.jpg', text: '-------  -------<br>----------  ----------', takenBy: null, isImportant: true},
+    { id: 5, image: 'images/6.jpg', text: '-------  -------<br>----------  ----------', takenBy: null, isImportant: true},
+    { id: 6, image: 'images/7.JPG', text: '-------  -------<br>----------  ----------', takenBy: null, isImportant: true},
+    { id: 7, image: 'images/8.jpg', text: '-------  -------<br>----------  ----------', takenBy: null, isImportant: true},
+    { id: 8, image: 'images/9.jpg', text: '-------  -------<br>----------  ----------', takenBy: null, isImportant: true},
+    { id: 10, image: 'images/10.jpg', text: '-------  -------<br>----------  ----------', takenBy: null, isImportant: true},
+    { id: 11, image: 'images/10.jpg', text: '-------  -------<br>----------  ----------', takenBy: null, isImportant: true},
+    { id: 12, image: 'images/10.jpg', text: '-------  -------<br>----------  ----------', takenBy: null, isImportant: true},
+    { id: 13, image: 'images/10.jpg', text: '-------  -------<br>----------  ----------', takenBy: null, isImportant: true},
+    { id: 14, image: 'images/10.jpg', text: '-------  -------<br>----------  ----------', takenBy: null, isImportant: true},
+    { id: 15, image: 'images/10.jpg', text: '-------  -------<br>----------  ----------', takenBy: null, isImportant: true},
+    { id: 16, image: 'images/10.jpg', text: '-------  -------<br>----------  ----------', takenBy: null, isImportant: true},
+    { id: 17, image: 'images/10.jpg', text: '-------  -------<br>----------  ----------', takenBy: null, isImportant: true},
+    { id: 18, image: 'images/10.jpg', text: '-------  -------<br>----------  ----------', takenBy: null, isImportant: true},
+    { id: 19, image: 'images/10.jpg', text: '-------  -------<br>----------  ----------', takenBy: null, isImportant: true},
+    { id: 20, image: 'images/10.jpg', text: '-------  -------<br>----------  ----------', takenBy: null, isImportant: true},
 ];
 
 //-----------------------------------------------------------------------
